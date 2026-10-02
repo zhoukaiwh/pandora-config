@@ -1,0 +1,190 @@
+# =====================================================================
+# Pandora — mihomo / Stash 分流配置（多设备订阅版）
+# 仓库：github.com/zhoukaiwh/pandora-config（公开仓库，禁止写入任何机密）
+# 机场订阅地址：本文件仅留占位，请在各设备本地「覆写」中填写真实地址
+# =====================================================================
+
+# ---------------- 基础配置 ----------------
+mixed-port: 7890
+allow-lan: false  # 如需局域网共享代理改回 true（无认证，谨慎开启）
+bind-address: "*"
+ipv6: false
+unified-delay: true
+tcp-concurrent: true
+log-level: warning
+global-client-fingerprint: chrome
+keep-alive-idle: 600
+keep-alive-interval: 15
+profile: {store-selected: true, store-fake-ip: true}
+external-controller: 127.0.0.1:9090  # 仅本机可连；原为 0.0.0.0 且无鉴权，属安全风险
+sniffer:
+ enable: true
+ parse-pure-ip: true
+ sniff: {HTTP: {ports: [80, 8080-8880], override-destination: true}, TLS: {ports: [443, 8443], override-destination: true}, QUIC: {ports: [443, 8443], override-destination: true}}
+ skip-domain: ["+.push.apple.com"]
+tun: {enable: true, stack: mixed, dns-hijack: ["any:53"], auto-route: true, auto-redirect: false, auto-detect-interface: true}
+skip-proxy:
+ - 'localhost.weixin.qq.com'
+ - 'report.url.cn'
+ - '127.0.0.1'
+ - '::1'
+
+# ---------------- DNS 配置 ----------------
+dns:
+ enable: true
+ listen: 127.0.0.1:1053  # 仅本机；如允许局域网设备用本机 DNS 改回 0.0.0.0:1053
+ ipv6: false
+ respect-rules: true
+ enhanced-mode: fake-ip
+ fake-ip-range: 198.18.0.1/16
+ fake-ip-filter-mode: blacklist
+ fake-ip-filter: [rule-set:fakeipfilter_domain, +.lan, +.local]
+ default-nameserver: [223.5.5.5, 119.29.29.29]
+ proxy-server-nameserver: [223.5.5.5, 119.29.29.29]
+ nameserver: [https://dns.alidns.com/dns-query, https://doh.pub/dns-query]
+
+proxies:
+ - {name: 🎯 直连, type: direct}
+
+# ---------------- 代理集合 ----------------
+proxy-providers:
+ Airport:
+  # ⚠️ 占位地址：真实订阅 URL 含机密 token，禁止提交到本仓库。
+  # 请在设备端覆写（Sparkle Override / Stash 本地编辑）中填写完整订阅地址。
+  url: "https://example.com/PASTE-SUBSCRIPTION-URL-ON-EACH-DEVICE"
+  type: http
+  interval: 86400
+  filter: "(?i)(港|HK|Hong|新加|坡|狮|SG|Singapore|日本|JP|Japan|美|US|States|America)"
+  health-check: {enable: true, url: https://www.gstatic.com/generate_204, interval: 300, timeout: 1200, expected-status: 204}
+  proxy: 🎯 直连
+
+# ---------------- 策略组 ----------------
+proxy-groups:
+ # 1. 核心与高频
+ - {name: 🚀 默认代理, type: select, proxies: [🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点, 🎯 直连]}
+ - {name: 🤖 AI, type: select, proxies: [🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+ - {name: 📲 Telegram, type: select, proxies: [🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+ - {name: 🍀 Google, type: select, proxies: [🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+
+ # 2. 流媒体
+ - {name: 📹 YouTube, type: select, proxies: [🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+ - {name: 🎥 NETFLIX, type: select, proxies: [🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+ - {name: 🎬 HBOMax, type: select, proxies: [🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+ - {name: 🧸 Disney+, type: select, proxies: [🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+
+ # 3. 系统与底层
+ - {name: 🍏 iCloud, type: select, proxies: [🎯 直连, 🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+ - {name: 🍎 Apple, type: select, proxies: [🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点, 🎯 直连]}
+ - {name: 🐬 OneDrive, type: select, proxies: [🎯 直连, 🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+ - {name: 🪟 Microsoft, type: select, proxies: [🎯 直连, 🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+
+ # 4. 生产力与工具
+ - {name: 👨🏿‍💻 GitHub, type: select, proxies: [🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+ - {name: 💶 PayPal, type: select, proxies: [🇭🇰 香港自动, 🇸🇬 狮城自动, 🇯🇵 日本自动, 🇺🇲 美国自动, 🇭🇰 香港手动, 🇸🇬 狮城手动, 🇯🇵 日本手动, 🇺🇲 美国手动, 🌐 全部节点]}
+
+ # ============ 5. 地区组 ============
+
+ # --- 🇭🇰 香港 ---
+ - {name: 🇭🇰 香港手动, type: select, proxies: [🇭🇰 香港标准, 🇭🇰 香港高级]}
+ - {name: 🇭🇰 香港自动, hidden: true, type: fallback, url: "https://www.gstatic.com/generate_204", interval: 300, timeout: 200, proxies: [🇭🇰 香港高级, 🇭🇰 香港标准]}
+ - {name: 🇭🇰 香港标准, hidden: true, type: fallback, url: "https://www.gstatic.com/generate_204", interval: 300, timeout: 200, use: [Airport], filter: "(?i)^(?=.*(港|HK|Hong))(?=.*标准).*$", exclude-filter: "(?i)Traffic|Expire|台|日|韩|新|深|美"}
+ - {name: 🇭🇰 香港高级, hidden: true, type: url-test, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 20, timeout: 200, use: [Airport], filter: "(?i)^(?=.*(港|HK|Hong))(?=.*高级).*$", exclude-filter: "(?i)Traffic|Expire|台|日|韩|新|深|美"}
+
+ # --- 🇸🇬 狮城 ---
+ - {name: 🇸🇬 狮城手动, type: select, proxies: [🇸🇬 狮城标准, 🇸🇬 狮城高级]}
+ - {name: 🇸🇬 狮城自动, hidden: true, type: fallback, url: "https://www.gstatic.com/generate_204", interval: 300, timeout: 200, proxies: [🇸🇬 狮城高级, 🇸🇬 狮城标准]}
+ - {name: 🇸🇬 狮城标准, hidden: true, type: fallback, url: "https://www.gstatic.com/generate_204", interval: 300, timeout: 200, use: [Airport], filter: "(?i)^(?=.*(新加坡|坡|狮城|SG|Singapore))(?=.*标准).*$", exclude-filter: "(?i)Traffic|Expire|港|台|韩|日|美"}
+ - {name: 🇸🇬 狮城高级, hidden: true, type: url-test, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 20, timeout: 200, use: [Airport], filter: "(?i)^(?=.*(新加坡|坡|狮城|SG|Singapore))(?=.*高级).*$", exclude-filter: "(?i)Traffic|Expire|港|台|韩|日|美"}
+
+ # --- 🇯🇵 日本 ---
+ - {name: 🇯🇵 日本手动, type: select, proxies: [🇯🇵 日本标准, 🇯🇵 日本高级]}
+ - {name: 🇯🇵 日本自动, hidden: true, type: fallback, url: "https://www.gstatic.com/generate_204", interval: 300, timeout: 200, proxies: [🇯🇵 日本高级, 🇯🇵 日本标准]}
+ - {name: 🇯🇵 日本标准, hidden: true, type: fallback, url: "https://www.gstatic.com/generate_204", interval: 300, timeout: 200, use: [Airport], filter: "(?i)^(?=.*(日|JP|Japan))(?=.*标准).*$", exclude-filter: "(?i)Traffic|Expire|港|台|韩|新|美"}
+ - {name: 🇯🇵 日本高级, hidden: true, type: url-test, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 20, timeout: 200, use: [Airport], filter: "(?i)^(?=.*(日|JP|Japan))(?=.*高级).*$", exclude-filter: "(?i)Traffic|Expire|港|台|韩|新|美"}
+
+ # --- 🇺🇲 美国 ---
+ - {name: 🇺🇲 美国手动, type: select, proxies: [🇺🇲 美国标准, 🇺🇲 美国高级]}
+ - {name: 🇺🇲 美国自动, hidden: true, type: fallback, url: "https://www.gstatic.com/generate_204", interval: 300, timeout: 300, proxies: [🇺🇲 美国高级, 🇺🇲 美国标准]}
+ - {name: 🇺🇲 美国标准, hidden: true, type: fallback, url: "https://www.gstatic.com/generate_204", interval: 300, timeout: 300, use: [Airport], filter: "(?i)^(?=.*(美|US|States|America))(?=.*标准).*$", exclude-filter: "(?i)Traffic|Expire|港|台|日|韩|新"}
+ - {name: 🇺🇲 美国高级, hidden: true, type: url-test, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 20, timeout: 300, use: [Airport], filter: "(?i)^(?=.*(美|US|States|America))(?=.*高级).*$", exclude-filter: "(?i)Traffic|Expire|港|台|日|韩|新"}
+
+ # --- 6. 全部节点 ---
+ - {name: 🌐 全部节点, type: select, proxies: [🎯 直连], use: [Airport], exclude-filter: "(?i)Traffic|Expire"}
+
+# ---------------- 规则配置 ----------------
+rules:
+ # 1. 基础拦截与直连
+ - RULE-SET,private_ip,🎯 直连,no-resolve
+ - RULE-SET,private_domain,🎯 直连
+ - RULE-SET,proxylite,🚀 默认代理
+
+ # 2. 高频应用 (AI / Social)
+ - RULE-SET,ai,🤖 AI
+ - RULE-SET,telegram_domain,📲 Telegram
+
+ # 3. 核心流媒体
+ - RULE-SET,youtube_domain,📹 YouTube
+ - RULE-SET,netflix_domain,🎥 NETFLIX
+ - RULE-SET,hbo_domain,🎬 HBOMax
+ - RULE-SET,disney_domain,🧸 Disney+
+
+ # 4. 生产力与开发
+ - RULE-SET,github_domain,👨🏿‍💻 GitHub
+ - RULE-SET,cloudflare_domain,🚀 默认代理
+ - RULE-SET,paypal_domain,💶 PayPal
+
+ # 5. 生态系统
+ - RULE-SET,google_domain,🍀 Google
+ - RULE-SET,apple_cn,🍏 iCloud
+ - RULE-SET,apple_global,🍎 Apple
+ - RULE-SET,onedrive_domain,🐬 OneDrive
+ - RULE-SET,microsoft_domain,🪟 Microsoft
+ - RULE-SET,speedtest_domain,🚀 默认代理
+
+ # 6. IP 类规则 (DNS解析后匹配)
+ - RULE-SET,telegram_ip,📲 Telegram,no-resolve
+ - RULE-SET,google_ip,🍀 Google,no-resolve
+ - RULE-SET,netflix_ip,🎥 NETFLIX,no-resolve
+ - RULE-SET,apple_ip,🍏 iCloud,no-resolve
+
+ # 7. 地区与兜底
+ - RULE-SET,geolocation-!cn,🚀 默认代理
+ - RULE-SET,cn_domain,🎯 直连
+ - RULE-SET,cn_ip,🎯 直连
+ - MATCH,🚀 默认代理
+
+# 规则集统一走 jsDelivr 国内可达镜像（testingcf 节点）。
+# 若镜像失效，把下方 URL 的 https://testingcf.jsdelivr.net/gh/<用户>/<仓库>@<分支>/
+# 整体换回 https://raw.githubusercontent.com/<用户>/<仓库>/<分支>/ 即可。
+rule-anchor:
+ ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
+ domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
+ class: &class {type: http, interval: 86400, behavior: classical, format: text}
+
+rule-providers:
+ fakeipfilter_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/wwqgtxx/clash-rules@release/fakeip-filter.mrs"}
+ private_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.mrs"}
+ proxylite: {!!merge <<: *class, url: "https://testingcf.jsdelivr.net/gh/qichiyuhub/rule@main/proxy.list"}
+ ai: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ai-!cn.mrs"}
+ youtube_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/youtube.mrs"}
+ hbo_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/hbo.mrs"}
+ disney_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/disney.mrs"}
+ cloudflare_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/cloudflare.mrs"}
+ google_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/google.mrs"}
+ github_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/github.mrs"}
+ telegram_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/telegram.mrs"}
+ netflix_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/netflix.mrs"}
+ paypal_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/paypal.mrs"}
+ onedrive_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/onedrive.mrs"}
+ microsoft_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/microsoft.mrs"}
+ speedtest_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/ookla-speedtest.mrs"}
+ geolocation-!cn: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-!cn.mrs"}
+ cn_domain: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/cn.mrs"}
+ apple_cn: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/apple-cn.mrs"}
+ apple_global: {!!merge <<: *domain, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/apple.mrs"}
+ private_ip: {!!merge <<: *ip, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/private.mrs"}
+ cn_ip: {!!merge <<: *ip, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/cn.mrs"}
+ google_ip: {!!merge <<: *ip, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/google.mrs"}
+ telegram_ip: {!!merge <<: *ip, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/telegram.mrs"}
+ netflix_ip: {!!merge <<: *ip, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/netflix.mrs"}
+ apple_ip: {!!merge <<: *ip, url: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo-lite/geoip/apple.mrs"}
